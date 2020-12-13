@@ -143,17 +143,26 @@ Make sure that the public key is stored on the CloudWatch Log proxy server under
 
 ### Create SCP script
 
-On the CloudGuard Management server, we will need to create a script to send CME logs
+On the CloudGuard Management server, we will need to create a script to send CME logs. Download [the script](send-logs-to-proxy.sh) from this repository, and update the variable accordingly. 
 
 ```bash
 #!/bin/bash
 # This script sends CloudGuard Logs from Management Server to CloudWatch Log proxy server.
+# Author: Jayden Kyaw Htet Aung - Check Point Software Technologies
 
 #UPDATE THE FOLLOWING VARIABLES!
 sshkey_dir="ssh_keys/mgmt_ssh_key.prv"
+
+#SOURCE
 source_dir="/var/log/CPcme/cme.log"
+
+#USER NAME ON CLOUDWATCH PROXY INSTANCE 
 dst_user="root"
+
+#CLOUDWATCH PROXY INSTNACE'S IP OR HOSTNAME 
 dsthost="10.5.0.8"
+
+#DESTINATION DIRECTORY ON THE CLOUDWATCH PROXY INSTNANCE
 dst_dir="/opt/aws/amazon-cloudwatch-agent/logs"
 
 echo send CloudGuard logs to CloudWatch Log Proxy Server: $dsthost
@@ -161,28 +170,24 @@ echo send CloudGuard logs to CloudWatch Log Proxy Server: $dsthost
 scp -i $sshkey_dir -r $source_dir $dst_user@$dsthost:/$dst_dir
 
 echo Logs sent on `date`
-
 ```
 
-Create the script and store it at, for example, 
-***/home/admin/cloudwatch/send-logs.sh*** 
+Once you've updated it, and store it at, for example, 
+***/home/admin/cloudwatch/send-logs-to-proxy.sh*** 
 
 Make it executable:
 
 ```bash
-chomd +x /home/admin/cloudwatch/send-logs.sh
+chomd +x /home/admin/cloudwatch/send-logs-to-proxy.sh
 ```
 
-### CronTab
+### Crontab
 
-We'll need to create a cron job to send logs 
+We'll need to create a cron job to send logs by doing ```crontab -e```, and add the following.
 
 ```bash
-*/5 * * * * /home/admin/cloudwatch/send-logs.sh 
+*/5 * * * * /home/admin/cloudwatch/send-logs-to-proxy.sh 
 ```
 
 
-### cloudwatch-agent-config.cfg 
-
-You will need to edit ```cloudwatch-agent-config.cfg```, and  
 

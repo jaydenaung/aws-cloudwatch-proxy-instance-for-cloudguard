@@ -1,11 +1,20 @@
 #!/bin/bash
 # This script sends CloudGuard Logs from Management Server to CloudWatch Log proxy server.
+# Author: Jayden Kyaw Htet Aung - Check Point Software Technologies
 
 #UPDATE THE FOLLOWING VARIABLES!
 sshkey_dir="ssh_keys/mgmt_ssh_key.prv"
+
+#SOURCE
 source_dir="/var/log/CPcme/cme.log"
+
+#USER NAME ON CLOUDWATCH PROXY INSTANCE 
 dst_user="root"
+
+#CLOUDWATCH PROXY INSTNACE'S IP OR HOSTNAME 
 dsthost="10.5.0.8"
+
+#DESTINATION DIRECTORY ON THE CLOUDWATCH PROXY INSTNANCE
 dst_dir="/opt/aws/amazon-cloudwatch-agent/logs"
 
 echo send CloudGuard logs to CloudWatch Log Proxy Server: $dsthost
