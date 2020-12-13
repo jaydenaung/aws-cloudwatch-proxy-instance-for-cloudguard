@@ -1,6 +1,6 @@
 # AWS CloudWatch Log proxy EC2 instance for CloudGuard
 
-This tutorial details a very simple proof-of-concept on forwarding system logs from Check Point CloudGuard Management server to AWS CloudWatch or AWS S3 bucket via an EC2 instance acting as a log forwarder or proxy instance. The need for a proxy instance is because, at this point of time, CloudWatch agent or AWS CLI cannot be installed on the Check Point Management Server due to the management server being hardened. One example use case for this is you might want to pipe CloudGuard's cloud management extension logs (cme.log) to AWS CloudWatch for either log aggregation, troubleshooting or analysis purpose. 
+This tutorial details a very simple proof-of-concept on forwarding system logs from Check Point CloudGuard Management server to AWS CloudWatch or AWS S3 bucket via an EC2 instance acting as a log forwarder or proxy instance. The need for a proxy instance is because, at the point of writing this tutorial, CloudWatch agent or AWS CLI cannot be installed on the Check Point Management Server due to the management server being hardened. One example use case for this is you might want to pipe CloudGuard's system logs such as cloud management extension logs (cme.log) to AWS CloudWatch or S3 bucket for either log aggregation, troubleshooting or analysis purpose. 
 
 I've created this lab and tutorial based on an actual use case of a customer who has a similar requirement. 
 
@@ -311,7 +311,7 @@ Your ```cme.log``` is now uploaded to S3 bucket.
 ---
 # Conclusion
 
-This tutorial discusses a simple demonstration of piping CloudGuard ```cme.log``` to AWS CloudWatch and S3 Buckets via a proxy instance on which AWS CloudWatch agent is installed. I've also added another script (curl-to-s3.sh) for directly uploading log files to S3 bucket using curl. This is just a concept, and as mentioned before, SCP is not a perfect way of piping logs (But it is a simple and yet secure way for a demo!). However, you can apply this concept in other uses cases, and pipe any system-specific logs from hardened virtual appliances to AWS for troubleshooting or analysis purposes.
+This tutorial discusses a simple demonstration of piping CloudGuard ```cme.log``` to AWS CloudWatch and S3 Buckets via a proxy instance on which AWS CloudWatch agent is installed. I've also added another script (curl-to-s3.sh) for directly uploading log files to S3 bucket using curl. Again, this is just a concept, and as mentioned before, SCP is not a perfect way of piping logs (But it is a simple and yet secure way for a demo!). However, you can apply this concept in other uses cases, and pipe any system-specific logs from hardened virtual appliances to AWS for troubleshooting or analysis purposes.
 
 The major takeaway from this tutorial is once the logs are piped to a cloudwatch proxy instance, you can then forward them to pretty much any AWS monitoring service!
 
