@@ -98,7 +98,7 @@ For more informaiton on [CloudWatch Agent](https://docs.aws.amazon.com/AmazonClo
 
 ## 2. CloudGuard Management Server Configurations
 
-On CloudGuard Management server, you will need to set up SSH keys, create a script to send the logs, and configure crond to schedule piping logs to the CloudWatch proxy instance. 
+On CloudGuard Management server, you will need to set up SSH keys, create a script that forwards the logs to proxy instance, and configure a Cron job to schedule piping logs.
 
 ### Create SSH Keys
 
@@ -115,7 +115,7 @@ This key pair will be used when communicating with CloudWatch Log proxy server v
 
 ### Create a SCP script to pipe logs
 
-In this lab we will be sending ```cme.log``` via SCP. This is not a perfect approach for piping logs, but this tutorial aims to present a concept, and meant for demonstration purpose. You can also use other means of streaming logs.  
+In this lab we will be sending ```cme.log``` via SCP. This is not a perfect approach for piping logs, but this tutorial aims to present a proof-of-concept, and meant for demonstration purpose only. You can also use other means of streaming logs that suit your requirements.   
 
 On the CloudGuard Management server, we will need to create a script to send CME logs. Download [the script](send-logs-to-proxy.sh) from this repository, and update the variable accordingly. 
 
@@ -188,7 +188,7 @@ Dec 13 06:20:01 2020 mgmt-geo crond[6743]: (admin) CMD (/home/admin/cloudwatch/s
 /opt/aws/amazon-cloudwatch-agent/bin/amazon-cloudwatch-agent-ctl -a fetch-config -m ec2 -c file:cloudwatch-config.cfg -s 
 ```
 
-This will basically load ```cloudwatch-config.cfg`` and start the cloudwatch agent on the EC2 instance. To ensure that CloudWatch agent is running, execute the following and check the status
+This will basically load ```cloudwatch-config.cfg``` and start the cloudwatch agent on the EC2 instance. To ensure that CloudWatch agent is running, execute the following and check the status
 
 ```bash
 sudo service amazon-cloudwatch-agent status
