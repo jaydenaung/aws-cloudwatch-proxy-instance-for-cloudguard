@@ -127,9 +127,11 @@ Hint: Some lines were ellipsized, use -l to show in full.
 
 ## 2. CloudGuard Management Server
 
-On CloudGuard Management server, 
+On CloudGuard Management server, you will need to set up SSH keys, create a script to send the logs, and configure crond to schedule piping logs to the CloudWatch proxy instance. 
 
 ### Create SSH Keys
+
+You'll need to create a unique pair of SSH keys for the purpose of sending logs from management server to Cloudwatch proxy instance via SSH/SCP.
 
 ```bash
 ssh-keygen -t rsa
@@ -140,8 +142,9 @@ This key will be used when communicating with CloudWatch Log proxy server via SS
 Make sure that the public key is stored on the CloudWatch Log proxy server under a user's directory ``` ./ssh/authorized_keys ```.
 
 
-
 ### Create SCP script
+
+In this lab we will be sending ```cme.log``` via SCP. This is not a perfect approach of sending logs, but this tutorial is meant for demonstration purpose. You can also use other means of sending logs 
 
 On the CloudGuard Management server, we will need to create a script to send CME logs. Download [the script](send-logs-to-proxy.sh) from this repository, and update the variable accordingly. 
 
