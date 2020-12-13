@@ -176,9 +176,12 @@ Expected Output:
 ```bash
 Dec 13 06:20:01 2020 mgmt-geo crond[6743]: (admin) CMD (/home/admin/cloudwatch/send-logs.sh)
 ```
+
+Also, you should run the script manually to see if the ```cme.log``` gets transferred to the cloud proxy instance. 
+
 ---
 
-## 3. Sending logs to AWS CloudWatch Log Group
+## 3. Forwarding logs to AWS CloudWatch Log Group
 
 - Go back to CloudWatch proxy instance 
 - Go to the directory ```cd /home/user/cloudwatch-config/```
