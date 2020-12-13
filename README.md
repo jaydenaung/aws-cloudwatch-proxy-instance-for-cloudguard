@@ -121,13 +121,13 @@ On the CloudGuard Management server, we will need to create a script to send CME
 #UPDATE THE FOLLOWING VARIABLES!
 sshkey_dir="ssh_keys/mgmt_ssh_key.prv"
 
-#SOURCE
+#SOURCE DIRECTORY
 source_dir="/var/log/CPcme/cme.log"
 
 #USER NAME ON CLOUDWATCH PROXY INSTANCE 
-dst_user="root"
+dst_user="not-root"
 
-#CLOUDWATCH PROXY INSTNACE'S IP OR HOSTNAME 
+#CLOUDWATCH PROXY INSTANCE'S IP OR HOSTNAME 
 dsthost="10.5.0.8"
 
 #DESTINATION DIRECTORY ON THE CLOUDWATCH PROXY INSTNANCE

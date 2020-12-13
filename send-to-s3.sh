@@ -1,5 +1,5 @@
 #!/bin/bash
-# This script sends CloudGuard Logs from Management Server to CloudWatch proxy instance.
+# This script sends CloudGuard Logs from Check Point Management Server to CloudWatch proxy instance.
 # Author: Jayden Kyaw Htet Aung - Check Point Software Technologies
 
 #UPDATE THE FOLLOWING VARIABLES!

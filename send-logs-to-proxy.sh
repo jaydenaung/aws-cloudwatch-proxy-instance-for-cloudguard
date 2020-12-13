@@ -1,17 +1,17 @@
 #!/bin/bash
-# This script sends CloudGuard Logs from Management Server to CloudWatch Log proxy server.
+# This script sends CloudGuard Logs from Check Point Management Server to CloudWatch proxy instance.
 # Author: Jayden Kyaw Htet Aung - Check Point Software Technologies
 
 #UPDATE THE FOLLOWING VARIABLES!
 sshkey_dir="ssh_keys/mgmt_ssh_key.prv"
 
-#SOURCE
+#SOURCE DIRECTORY
 source_dir="/var/log/CPcme/cme.log"
 
 #USER NAME ON CLOUDWATCH PROXY INSTANCE 
-dst_user="root"
+dst_user="not-root"
 
-#CLOUDWATCH PROXY INSTNACE'S IP OR HOSTNAME 
+#CLOUDWATCH PROXY INSTANCE'S IP OR HOSTNAME 
 dsthost="10.5.0.8"
 
 #DESTINATION DIRECTORY ON THE CLOUDWATCH PROXY INSTNANCE
