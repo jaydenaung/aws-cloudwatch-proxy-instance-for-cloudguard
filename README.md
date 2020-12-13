@@ -14,15 +14,15 @@ In this lab, we will demonstrate piping CloudGuard Cloud Management Extension lo
 
 ### Launch an EC2 instance 
 
-Firstly, we need to deploy an EC2 instance to act as "proxy" server. Le The server can be any linux server. In our lab, we will be using "AWS Linux". 
+Firstly, we need to deploy an EC2 instance to act as "proxy" server.The server can be any Linux server the demo. In our lab, we will be using "AWS Linux". 
 
-Please see [how to launch an EC2 instance.](https://docs.aws.amazon.com/quickstarts/latest/vmlaunch/step-1-launch-instance.html)
+If you are not familiar with how to launch an EC2 instgance, please check out this [how to launch an EC2 instance.](https://docs.aws.amazon.com/quickstarts/latest/vmlaunch/step-1-launch-instance.html)
 
 You should also set up the instance's networking so that it can communicate with the CloudGuard management server. By default, if it is deployed into a same VPC as Management Server, it can communicate with the management server. We'll also need to make sure that Security Groups of both Management Server and CloudWatch proxy instance allow SSH traffic to and from each other. 
 
 ###  Download the CloudWatch Log agent
 
-Secondly, download the CloudWatch Log agent and configure the CloudWatch Agent.
+We will then need to download the CloudWatch Log agent and configure the CloudWatch agent on the EC2 instance (CloudWatch proxy instance) that we've just launched. 
 
 Since we're using Amazon Linux, we can do the following.
 
