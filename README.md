@@ -4,7 +4,7 @@ This tutorial shows how to pipe system logs from Check Point CloudGuard Manageme
 
 ![header image](img/cg-cloudwatch-diagram.png)
 
-In this lab, we will, firstly, pipe CloudGuard logs (from Management Server) to another EC2 instance with CloudWatch agent installed - Let's call it CloudWatch proxy instance since we are using it as a proxy. You can use multiple ways to pipe logs to the instance. For example, you can use [Check Point Log Exporter](https://supportcenter.checkpoint.com/supportcenter/portal?eventSubmit_doGoviewsolutiondetails=&solutionid=sk122323), and use syslog to transfer to logs to an instance where rsyslog is installed. In this lab, however, we will just be using  SCP file transfer to simplicity's sake.
+In this lab, we will, firstly, pipe CloudGuard logs (from Management Server) to another EC2 instance with CloudWatch agent installed - Let's call it CloudWatch proxy instance since we are using it as a proxy. You can use multiple ways to pipe logs to the proxy instance. For example, you can use [Check Point Log Exporter](https://supportcenter.checkpoint.com/supportcenter/portal?eventSubmit_doGoviewsolutiondetails=&solutionid=sk122323), and use syslog to transfer to logs to an instance where rsyslog is installed. In this lab, however, we will just be using  SCP file transfer to simplicity's sake.
  
 Secondly, we will then forward the logs from the CloudWatch proxy instance to other destinations such as AWS CloudWatch Log Group or S3 bucket.
 
@@ -16,18 +16,18 @@ In this lab, we will demonstrate piping CloudGuard Cloud Management Extension lo
 
 ### Launch an EC2 instance 
 
-Firstly, we need to deploy an EC2 instance to act as "proxy" server.The server can be any Linux server the demo. In our lab, we will be using "AWS Linux". 
+Firstly, we need to deploy an EC2 instance to act as "proxy" server.The server can be any Linux server. In our lab, we will be using "Amazon Linux". 
 
-If you are not familiar with how to launch an EC2 instgance, please check out this [how to launch an EC2 instance.](https://docs.aws.amazon.com/quickstarts/latest/vmlaunch/step-1-launch-instance.html)
+If you are not familiar with how to launch an EC2 instance, please check out this [how to launch an EC2 instance.](https://docs.aws.amazon.com/quickstarts/latest/vmlaunch/step-1-launch-instance.html)
 
 You should also set up the instance's networking so that it can communicate with the CloudGuard management server. By default, if it is deployed into a same VPC as Management Server, it can communicate with the management server. We'll also need to make sure that Security Groups of both Management Server and CloudWatch proxy instance allow SSH traffic to and from each other. 
 
 
 ### Configure IAM Role
 
-If your cloudwatch proxy instance already has an IAM role associated with it, make sure that you include the IAM policy below. If you don't already have an IAM role assigned to your instance, you can use your IAM credentials for the next steps or you can assign an IAM role to that instance. For more information, see Attaching an IAM Role to an Instance.
+If your cloudwatch proxy instance already has an IAM role associated with it, make sure that you include the ***CloudWatchAgentServerPolicy** IAM policy. If you don't already have an IAM role assigned to your instance, you can use your IAM credentials for the next steps or you can assign an IAM role to that instance. 
 
-### To configure your IAM role or user for CloudWatch Logs
+### To configure your IAM role for CloudWatch Logs
 
 Open the IAM console at https://console.aws.amazon.com/iam/.
 
@@ -89,6 +89,8 @@ And we will need to;
 ```
 
 > We are sending cme.log from Management Server to this directory ```/opt/aws/amazon-cloudwatch-agent/logs/cme.log```. Therefore, we will need CloudWatch to collect ```cme.log``` from this directory, and pipe it to a CloudWatch log group called "cme.log". You can change this configuration to suit your requirement.
+
+For more informaiton on [CloudWatch Agent](https://docs.aws.amazon.com/AmazonCloudWatch/latest/monitoring/install-CloudWatch-Agent-commandline-fleet.html)
 
 ---
 
