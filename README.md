@@ -1,14 +1,16 @@
 # AWS CloudWatch Log proxy EC2 instance for CloudGuard
 
-This tutorial shows how to pipe system logs from Check Point CloudGuard Management server to AWS CloudWatch or AWS S3 bucket via a CloudWatch log server acting as a proxy. The need for a proxy instance is because, at this point of time, CloudWatch agent or AWS CLI cannot be installed on the Check Point Management Server due to the management server being hardened. One example use case is if you want to pipe CloudGuard's cloud management extension logs (cme.log) to AWS CloudWatch for either log aggregation, troubleshooting or analysis purpose. 
+This tutorial details a very simple proof-of-concept on forwarding system logs from Check Point CloudGuard Management server to AWS CloudWatch or AWS S3 bucket via an EC2 instance acting as a log forwarder or proxy instance. The need for a proxy instance is because, at this point of time, CloudWatch agent or AWS CLI cannot be installed on the Check Point Management Server due to the management server being hardened. One example use case for this is you might want to pipe CloudGuard's cloud management extension logs (cme.log) to AWS CloudWatch for either log aggregation, troubleshooting or analysis purpose. 
+
+I've created this lab and tutorial based on an actual use case of a customer who has a similar requirement. 
 
 ![header image](img/cg-cloudwatch-diagram.png)
 
-In this lab, we will, firstly, pipe CloudGuard logs (from Management Server) to another EC2 instance with CloudWatch agent installed - Let's call it CloudWatch proxy instance since we are using it as a proxy. You can use multiple ways to pipe logs to the proxy instance. For example, you can use [Check Point Log Exporter](https://supportcenter.checkpoint.com/supportcenter/portal?eventSubmit_doGoviewsolutiondetails=&solutionid=sk122323), and use syslog to transfer to logs to an instance where rsyslog is installed. In this lab, however, we will just be using  SCP file transfer to simplicity's sake.
- 
-Secondly, we will then forward the logs from the CloudWatch proxy instance to other destinations such as AWS CloudWatch Log Group or S3 bucket.
+In this lab, we will, firstly, pipe CloudGuard logs (from Management Server) to another EC2 instance with CloudWatch agent installed - Let's call it CloudWatch proxy instance since we are using it as a proxy.
 
-In this lab, we will demonstrate piping CloudGuard Cloud Management Extension logs - ```cme.log``` from Management Server to CloudWatch Logs Group **and** S3 Bucket. 
+There are multiple ways to pipe logs to the cloudwatch proxy instance. For example, you can use [Check Point Log Exporter](https://supportcenter.checkpoint.com/supportcenter/portal?eventSubmit_doGoviewsolutiondetails=&solutionid=sk122323), and use syslog to transfer to logs to an instance where rsyslog is installed. In this lab, however, we will just be using  SCP file transfer to simplicity's sake. SCP is not the best approach for streaming logs, however, we will be doing a simple proof-of-concept using SCP in this lab.
+ 
+Secondly, we will then forward the logs from the CloudWatch proxy instance to other destinations such as AWS CloudWatch Log Group or S3 bucket. In this lab, we will demonstrate piping CloudGuard Cloud Management Extension logs - ```cme.log``` from Management Server to CloudWatch Logs Group **and** S3 Bucket via the cloudwatch proxy instance.
 
 ---
 
@@ -16,7 +18,7 @@ In this lab, we will demonstrate piping CloudGuard Cloud Management Extension lo
 
 ### Launch an EC2 instance 
 
-Firstly, we need to deploy an EC2 instance to act as "proxy" server.The server can be any Linux server. In our lab, we will be using "Amazon Linux". 
+Firstly, we need to deploy an EC2 instance to act as a "proxy" instance.The instance can be any Linux server. In our lab, we will be using "Amazon Linux". 
 
 If you are not familiar with how to launch an EC2 instance, please check out this [how to launch an EC2 instance.](https://docs.aws.amazon.com/quickstarts/latest/vmlaunch/step-1-launch-instance.html)
 
@@ -100,20 +102,20 @@ On CloudGuard Management server, you will need to set up SSH keys, create a scri
 
 ### Create SSH Keys
 
-You'll need to create a unique pair of SSH keys for the purpose of sending logs from management server to Cloudwatch proxy instance via SSH/SCP.
+It's best to create a unique pair of SSH keys for the purpose of sending logs from management server to Cloudwatch proxy instance via SSH/SCP.
 
 ```bash
 ssh-keygen -t rsa
 ```
-This key will be used when communicating with CloudWatch Log proxy server via SSH/SCP.
+This key pair will be used when communicating with CloudWatch Log proxy server via SSH/SCP.
 
 
-Make sure that the public key is stored on the CloudWatch Log proxy server under a user's directory ``` ./ssh/authorized_keys ```.
+> Make sure that the public key is stored on the **CloudWatch proxy instance** under a user's directory ``` ./ssh/authorized_keys ```.
 
 
 ### Create a SCP script to pipe logs
 
-In this lab we will be sending ```cme.log``` via SCP. This is not a perfect approach of sending logs, but this tutorial is meant for demonstration purpose. You can also use other means of sending logs 
+In this lab we will be sending ```cme.log``` via SCP. This is not a perfect approach for piping logs, but this tutorial aims to present a concept, and meant for demonstration purpose. You can also use other means of streaming logs.  
 
 On the CloudGuard Management server, we will need to create a script to send CME logs. Download [the script](send-logs-to-proxy.sh) from this repository, and update the variable accordingly. 
 
@@ -250,7 +252,9 @@ In some cases, you may also want to pipe CloudGuard logs from CloudWatch proxy i
 }
 ```
 
-### Sending the logs to S3 Bucket
+### Forwarding logs to S3 Bucket
+
+#### 1. Uploading logs to S3 via Cloudwatch proxy instance 
 
 Download [send-to-s3.sh](send-to-s3.sh) from this repository, and edit it to suit your requirements.
 
@@ -276,14 +280,27 @@ echo Logs sent on `date`
 
 This is a simple script that basically uploads ```cme.log``` to the destination S3 bucket. You will need to make it executable and store it in a directory on the ***CloudWatch proxy instance***. 
 
-### Cron Job on the CloudWatch proxy instance 
+> For this script to run, you have to have ***AWS CLI*** installed on the instance. Amazon Linux comes with AWS CLI installed. 
 
-Again, we will need to configure a cron job to schedule piping of the logs to S3 bucket. 
+#### 2. Uploading logs to S3 directly from Check Point Management Server using curl
+
+> Note: This is still work in progress although the script will work in most cases.
+
+Download [curl-to-s3.sh](curl-to-s3.sh) from this repository, and edit it to suit your requirements. And place the script in a directory *e.g. /home/admin/cloudwatch/curl-to-s3.sh)
+
+
+### Cron Job on the CloudWatch proxy instance or Management Server
+
+For both methods, You will to create a cron job on either server to forward logs every 5 minutes by adding an entry to crond -  ```crontab -e```. For example, 
+
+```bash
+*/5 * * * * /home/admin/cloudwatch/curl-to-s3.sh 
+```
 
 ---
-# Summary
+# Conclusion
 
-This tutorial basically shows a demonstration of piping CloudGuard ```cme.log``` to AWS CloudWatch and S3 Buckets via a proxy instance on which AWS CloudWatch agent is installed. This is just a concept, and not a perfect way of piping logs. You can apply this concept in other uses cases, and pipe any system logs to AWS for troubleshooting or analysis purposes!
+This tutorial basically shows a demonstration of piping CloudGuard ```cme.log``` to AWS CloudWatch and S3 Buckets via a proxy instance on which AWS CloudWatch agent is installed. This is just a concept, and not a perfect way of piping logs. You can apply this concept in other uses cases, and pipe any system-specific logs from hardened virtual appliances to AWS for troubleshooting or analysis purposes!
 
 ---
 
