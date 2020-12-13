@@ -218,7 +218,7 @@ Hint: Some lines were ellipsized, use -l to show in full.
 ```
 ### Observe the CloudWatch Log Group (cme.log)
 
-You can see that logs are being streamed to CloudWatch log group called "cme.log". 
+You can see that logs are being forwarded to CloudWatch log group called "cme.log". 
 
 ![header image](img/cme-log-cloudwatch.png)
 
@@ -294,6 +294,12 @@ For both methods, You will to create a cron job on either server to forward logs
 ```bash
 */5 * * * * /home/admin/cloudwatch/curl-to-s3.sh 
 ```
+
+Run either script manually once to see if the file gets uploaded. Verify the file on AWS S3 console.
+
+![header image](img/cme-log-s3.png)   
+
+Your ```cme.log``` is now uploaded to S3 bucket. 
 
 ---
 # Conclusion
