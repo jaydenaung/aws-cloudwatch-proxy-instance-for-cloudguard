@@ -226,13 +226,15 @@ You can see that logs are being forwarded to CloudWatch log group called "cme.lo
 
 ## 4. Sending logs to AWS S3 Bucket
 
-In some cases, you may also want to pipe CloudGuard logs from CloudWatch proxy instance to S3 Bucket for variety of reasons. 
+In some cases, you may also want to forward or upload CloudGuard system logs to S3 Bucket for a variety of reasons. 
+
+You can either forward the logs to S3 bucket via cloudwatch proxy instance or upload it directly from Management server (using Curl - for now.)
 
 ### Prerequisites 
 
 - The destination S3 Bucket with appropriate bucket policies should already be created as this is not covered in this tutorial.
 - VPC endpoint to S3 bucket should be created for the CloudWatch proxy instance. The secure way to access an S3 bucket is via VPC endpoint rather as opposed to public networks.
-- IAM Policy that allows uploading of files to S3 bucket should be attached to the CloudWatch proxy instance's role.
+- AWS IAM Policy that allows uploading of files to S3 bucket should be attached to the CloudWatch proxy instance's role. (This is for uploading via cloudwatch proxy instance)
 
 > Below is an example policy in JSON format.
 
@@ -283,6 +285,8 @@ This is a simple script that basically uploads ```cme.log``` to the destination 
 ### 2. Uploading logs to S3 directly from Check Point Management Server using curl
 
 > Note: This is still work in progress although the script will work in most cases.
+
+If you want to upload the log files directly from Check Point management server, you will first need to attach an S3 policy to management server's role so that it can upload the file to S3 bucket.
 
 Download [curl-to-s3.sh](curl-to-s3.sh) from this repository, and edit it to suit your requirements. And place the script in a directory *e.g. /home/admin/cloudwatch/curl-to-s3.sh)
 
