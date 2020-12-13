@@ -252,9 +252,7 @@ In some cases, you may also want to pipe CloudGuard logs from CloudWatch proxy i
 }
 ```
 
-### Forwarding logs to S3 Bucket
-
-#### 1. Uploading logs to S3 via Cloudwatch proxy instance 
+### 1. Uploading logs to S3 via Cloudwatch proxy instance 
 
 Download [send-to-s3.sh](send-to-s3.sh) from this repository, and edit it to suit your requirements.
 
@@ -282,7 +280,7 @@ This is a simple script that basically uploads ```cme.log``` to the destination 
 
 > For this script to run, you have to have ***AWS CLI*** installed on the instance. Amazon Linux comes with AWS CLI installed. 
 
-#### 2. Uploading logs to S3 directly from Check Point Management Server using curl
+### 2. Uploading logs to S3 directly from Check Point Management Server using curl
 
 > Note: This is still work in progress although the script will work in most cases.
 
