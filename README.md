@@ -224,7 +224,7 @@ You can see that logs are being forwarded to CloudWatch log group called "cme.lo
 
 ---
 
-## 4. Sending logs to AWS S3 Bucket
+## 4. Uploading logs to AWS S3 Bucket
 
 In some cases, you may also want to forward or upload CloudGuard system logs to S3 Bucket for a variety of reasons. 
 
