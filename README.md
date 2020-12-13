@@ -76,7 +76,7 @@ For other operating systems, please check out [this AWS Documentation for how to
 
 And we will need to;
 
-- Download the configuration file [cloudwatch-agent-config.cfg](cloudwatch-agent-config.cfg) from this repository
+- Download the sample configuration file [cloudwatch-agent-config.cfg](cloudwatch-agent-config.cfg) from this repository
 - Place it in a directory (e.g. /home/user/cloudwatch-config)
 - Edit the **file_path** in the configuration file:
 ```bash
