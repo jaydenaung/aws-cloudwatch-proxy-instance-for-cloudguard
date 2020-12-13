@@ -6,7 +6,7 @@ In this lab, we will, firstly, pipe CloudGuard logs (from Management Server) to 
  
 Secondly, we will then forward the logs from the CloudWatch proxy instance to other destinations such as AWS CloudWatch Log Group or S3 bucket.
 
-In this lab, we will be piping ```cme.log``` from Management Server to CloudWatch Logs Group **and** S3 Bucket. 
+In this lab, we will demonstrate piping CloudGuard Cloud Management Extension logs - ```cme.log``` from Management Server to CloudWatch Logs Group **and** S3 Bucket. 
 
 ## 1. Launch an EC2 Instance 
 
