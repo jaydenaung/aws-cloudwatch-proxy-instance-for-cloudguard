@@ -88,41 +88,6 @@ And we will need to;
 
 > We are sending cme.log from Management Server to this directory ```/opt/aws/amazon-cloudwatch-agent/logs/cme.log```. Therefore, we will need CloudWatch to collect ```cme.log``` from this directory, and pipe it to a CloudWatch log group called "cme.log". You can change this configuration to suit your requirement.
 
-- Go to the directory ```cd /home/user/cloudwatch-config/```
-- Execute the following command
-
-```bash
-/opt/aws/amazon-cloudwatch-agent/bin/amazon-cloudwatch-agent-ctl -a fetch-config -m ec2 -c file:cloudwatch-config.cfg -s 
-```
-
-This will basically load ```cloudwatch-config.cfg`` and start the cloudwatch agent on the EC2 instance. To ensure that CloudWatch agent is running, execute the following and check the status
-
-```bash
-sudo service amazon-cloudwatch-agent status
-```
-
-And here is the expected output if the agent is running
-
-```bash
-Redirecting to /bin/systemctl status amazon-cloudwatch-agent.service
-● amazon-cloudwatch-agent.service - Amazon CloudWatch Agent
-   Loaded: loaded (/etc/systemd/system/amazon-cloudwatch-agent.service; enabled; vendor preset: disabled)
-   Active: active (running) since Sun 2020-12-13 11:32:41 +08; 2h 8min ago
- Main PID: 3078 (amazon-cloudwat)
-   CGroup: /system.slice/amazon-cloudwatch-agent.service
-           └─3078 /opt/aws/amazon-cloudwatch-agent/bin/amazon-cloudwatch-agent -config /opt/aws/amazon-cloudwatch-agent/etc/amazon-cloudwatch-agent.toml -envconfig /opt/aws/amazon-cl...
-
-Dec 13 11:32:41 cloudwatch-proxy-instance systemd[1]: Started Amazon CloudWatch Agent.
-Dec 13 11:32:41 cloudwatch-proxy-instance systemd[1]: Starting Amazon CloudWatch Agent...
-Dec 13 11:32:41 cloudwatch-proxy-instance start-amazon-cloudwatch-agent[3078]: /opt/aws/amazon-cloudwatch-agent/etc/amazon-cloudwatch-agent.json does not exist or cannot read. Skipping it.
-Dec 13 11:32:41 cloudwatch-proxy-instance start-amazon-cloudwatch-agent[3078]: Valid Json input schema.
-Dec 13 11:32:41 cloudwatch-proxy-instance start-amazon-cloudwatch-agent[3078]: I! Detecting runasuser...
-Dec 13 11:32:43 cloudwatch-proxy-instance start-amazon-cloudwatch-agent[3078]: 2020/12/13 11:32:43 Seeked /opt/aws/amazon-cloudwatch-agent/logs/amazon-cloudwatch-agent.log - &{Offset:3...Whence:0}
-Dec 13 11:32:43 cloudwatch-proxy-instance start-amazon-cloudwatch-agent[3078]: 2020/12/13 11:32:43 Seeked /opt/aws/amazon-cloudwatch-agent/logs/cme.log - &{Offset:18167501 Whence:0}
-Dec 13 11:32:43 cloudwatch-proxy-instance start-amazon-cloudwatch-agent[3078]: 2020/12/13 11:32:43 Seeked /opt/aws/amazon-cloudwatch-agent/logs/test.log - &{Offset:38 Whence:0}
-Hint: Some lines were ellipsized, use -l to show in full.
-
-```
 
 
 ## 2. CloudGuard Management Server
@@ -150,7 +115,7 @@ On the CloudGuard Management server, we will need to create a script to send CME
 
 ```bash
 #!/bin/bash
-# This script sends CloudGuard Logs from Management Server to CloudWatch Log proxy server.
+# This script sends CloudGuard Logs from Check Point Management Server to CloudWatch Log proxy server.
 # Author: Jayden Kyaw Htet Aung - Check Point Software Technologies
 
 #UPDATE THE FOLLOWING VARIABLES!
@@ -184,13 +149,94 @@ Make it executable:
 chomd +x /home/admin/cloudwatch/send-logs-to-proxy.sh
 ```
 
+> The script will basically send ```/var/logs/CPcme/cme.log``` to ```/opt/aws/amazon-cloudwatch-agent/logs/cme.log```. 
+
+> And we have already configured CloudWatch Agent on monitor this directory ```/opt/aws/amazon-cloudwatch-agent/logs/cme.log```
+
 ### Crontab
 
-We'll need to create a cron job to send logs by doing ```crontab -e```, and add the following.
+We'll need to create a cron job to send logs every 5 minutes by doing ```crontab -e```, and add the following.
 
 ```bash
 */5 * * * * /home/admin/cloudwatch/send-logs-to-proxy.sh 
 ```
 
+> Note: You can edit the interval.
 
+Restart the crond. At this point of time, Cron is scheduled to pipe ```cme.log``` to CloudWatch proxy instance via SCP. Verify that cron is working by checking ```/var/logs/cron```
 
+Expected Output:
+
+```bash
+Dec 13 06:20:01 2020 mgmt-geo crond[6743]: (admin) CMD (/home/admin/cloudwatch/send-logs.sh)
+```
+
+## 3. Sending logs to AWS CloudWatch Log Group
+
+- Go back to CloudWatch proxy instance 
+- Go to the directory ```cd /home/user/cloudwatch-config/```
+- Assuming that you've followed the instructions to edit the CloudWatch agent configuration file (```cloudwatch-config.cfg```), Execute the following command:
+
+```bash
+/opt/aws/amazon-cloudwatch-agent/bin/amazon-cloudwatch-agent-ctl -a fetch-config -m ec2 -c file:cloudwatch-config.cfg -s 
+```
+
+This will basically load ```cloudwatch-config.cfg`` and start the cloudwatch agent on the EC2 instance. To ensure that CloudWatch agent is running, execute the following and check the status
+
+```bash
+sudo service amazon-cloudwatch-agent status
+```
+
+And here is the expected output if the agent is running
+
+```bash
+Redirecting to /bin/systemctl status amazon-cloudwatch-agent.service
+● amazon-cloudwatch-agent.service - Amazon CloudWatch Agent
+   Loaded: loaded (/etc/systemd/system/amazon-cloudwatch-agent.service; enabled; vendor preset: disabled)
+   Active: active (running) since Sun 2020-12-13 11:32:41 +08; 2h 8min ago
+ Main PID: 3078 (amazon-cloudwat)
+   CGroup: /system.slice/amazon-cloudwatch-agent.service
+           └─3078 /opt/aws/amazon-cloudwatch-agent/bin/amazon-cloudwatch-agent -config /opt/aws/amazon-cloudwatch-agent/etc/amazon-cloudwatch-agent.toml -envconfig /opt/aws/amazon-cl...
+
+Dec 13 11:32:41 cloudwatch-proxy-instance systemd[1]: Started Amazon CloudWatch Agent.
+Dec 13 11:32:41 cloudwatch-proxy-instance systemd[1]: Starting Amazon CloudWatch Agent...
+Dec 13 11:32:41 cloudwatch-proxy-instance start-amazon-cloudwatch-agent[3078]: /opt/aws/amazon-cloudwatch-agent/etc/amazon-cloudwatch-agent.json does not exist or cannot read. Skipping it.
+Dec 13 11:32:41 cloudwatch-proxy-instance start-amazon-cloudwatch-agent[3078]: Valid Json input schema.
+Dec 13 11:32:41 cloudwatch-proxy-instance start-amazon-cloudwatch-agent[3078]: I! Detecting runasuser...
+Dec 13 11:32:43 cloudwatch-proxy-instance start-amazon-cloudwatch-agent[3078]: 2020/12/13 11:32:43 Seeked /opt/aws/amazon-cloudwatch-agent/logs/amazon-cloudwatch-agent.log - &{Offset:3...Whence:0}
+Dec 13 11:32:43 cloudwatch-proxy-instance start-amazon-cloudwatch-agent[3078]: 2020/12/13 11:32:43 Seeked /opt/aws/amazon-cloudwatch-agent/logs/cme.log - &{Offset:18167501 Whence:0}
+Dec 13 11:32:43 cloudwatch-proxy-instance start-amazon-cloudwatch-agent[3078]: 2020/12/13 11:32:43 Seeked /opt/aws/amazon-cloudwatch-agent/logs/test.log - &{Offset:38 Whence:0}
+Hint: Some lines were ellipsized, use -l to show in full.
+
+```
+### Observe the CloudWatch Log Group (cme.log)
+
+You can see that logs are being streamed to CloudWatch log group called "cme.log". 
+
+![header image](img/cme-log-cloudwatch.png)
+
+## 4. Sending logs to AWS S3 Bucket
+
+In some cases, you may also want to pipe CloudGuard logs from CloudWatch proxy instance to S3 Bucket for variety of reasons. 
+
+Download [send-to-s3.sh](send-to-s3.sh) from this repository, and edit it to suit your requirements.
+
+```bash
+#!/bin/bash
+# This script sends CloudGuard Logs from Check Point  Management Server to CloudWatch proxy instance.
+# Author: Jayden Kyaw Htet Aung - Check Point Software Technologies
+
+#UPDATE THE FOLLOWING VARIABLES!
+#SET YOUR SOURCE DIRECTORY FROM WHICH LOGS WILL BE SENT
+source_dir="/opt/aws/amazon-cloudwatch-agent/logs/cme.log"
+
+#YOUR S3 BUCKET NAME TO PIPE THE LOGS
+dst_dir="s3://your-s3-bucket/uploads/cme.log"
+
+echo send CloudGuard logs to CloudWatch Log Proxy Server: $dsthost
+
+aws s3 cp $source_dir $dst_dir
+
+echo Logs sent on `date`
+
+```
