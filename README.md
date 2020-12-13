@@ -2,6 +2,8 @@
 
 This tutorial shows how to pipe system logs from Check Point CloudGuard Management server to AWS CloudWatch or AWS S3 bucket via a CloudWatch log server acting as a proxy. One example use case is if you want to pipe CloudGuard's cloud management extension logs (cme.log) to AWS CloudWatch for either log aggregation, troubleshooting or analysis purpose.
 
+![header image](img/cg-cloudwatch-diagram.png)
+
 In this lab, we will, firstly, pipe CloudGuard logs (from Management Server) to another EC2 instance with CloudWatch agent installed - Let's call it CloudWatch proxy instance since we are using it as a proxy. You can use multiple ways to pipe logs to the instance. For example, you can use [Check Point Log Exporter](https://supportcenter.checkpoint.com/supportcenter/portal?eventSubmit_doGoviewsolutiondetails=&solutionid=sk122323), and use syslog to transfer to logs to an instance where rsyslog is installed. In this lab, however, we will just be using  SCP file transfer to simplicity's sake.
  
 Secondly, we will then forward the logs from the CloudWatch proxy instance to other destinations such as AWS CloudWatch Log Group or S3 bucket.
@@ -20,9 +22,15 @@ You should also set up the instance's networking so that it can communicate with
 
 Secondly, download the CloudWatch Log agent and configure the CloudWatch Agent.
 
+Since we're using Amazon Linux, we can do the following.
+
 ```bash 
 sudo yum install amazon-cloudwatch-agent
+```
 
+For other operating systems, please check out [this AWS Documentation for how to install CloudWatch agent.](https://docs.aws.amazon.com/AmazonCloudWatch/latest/monitoring/download-cloudwatch-agent-commandline.html)
+
+```bash
 /opt/aws/amazon-cloudwatch-agent/bin/amazon-cloudwatch-agent-ctl -a fetch-config -m ec2 -c file:cloudwatch-config.cfg -s 
 ```
 
