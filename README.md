@@ -20,6 +20,46 @@ If you are not familiar with how to launch an EC2 instgance, please check out th
 
 You should also set up the instance's networking so that it can communicate with the CloudGuard management server. By default, if it is deployed into a same VPC as Management Server, it can communicate with the management server. We'll also need to make sure that Security Groups of both Management Server and CloudWatch proxy instance allow SSH traffic to and from each other. 
 
+
+### Configure IAM Role
+
+If your cloudwatch proxy instance already has an IAM role associated with it, make sure that you include the IAM policy below. If you don't already have an IAM role assigned to your instance, you can use your IAM credentials for the next steps or you can assign an IAM role to that instance. For more information, see Attaching an IAM Role to an Instance.
+
+### To configure your IAM role or user for CloudWatch Logs
+
+Open the IAM console at https://console.aws.amazon.com/iam/.
+
+In the navigation pane, choose Roles. Create a role (e.g.CloudWatchAgentServerRole), and attach the AWS policy called ***CloudWatchAgentServerPolicy** to the role. Or you can use following policy in JSON. 
+
+```bash
+{
+    "Version": "2012-10-17",
+    "Statement": [
+        {
+            "Effect": "Allow",
+            "Action": [
+                "cloudwatch:PutMetricData",
+                "ec2:DescribeVolumes",
+                "ec2:DescribeTags",
+                "logs:PutLogEvents",
+                "logs:DescribeLogStreams",
+                "logs:DescribeLogGroups",
+                "logs:CreateLogStream",
+                "logs:CreateLogGroup"
+            ],
+            "Resource": "*"
+        },
+        {
+            "Effect": "Allow",
+            "Action": [
+                "ssm:GetParameter"
+            ],
+            "Resource": "arn:aws:ssm:*:*:parameter/AmazonCloudWatch-*"
+        }
+    ]
+}
+```
+
 ###  Download the CloudWatch Log agent
 
 We will then need to download the CloudWatch Log agent and configure the CloudWatch agent on the EC2 instance (CloudWatch proxy instance) that we've just launched. 
@@ -32,8 +72,56 @@ sudo yum install amazon-cloudwatch-agent
 
 For other operating systems, please check out [this AWS Documentation for how to install CloudWatch agent.](https://docs.aws.amazon.com/AmazonCloudWatch/latest/monitoring/download-cloudwatch-agent-commandline.html)
 
+And we will need to;
+
+- Download the configuration file [cloudwatch-agent-config.cfg](cloudwatch-agent-config.cfg) from this repository
+- Place it in a directory (e.g. /home/user/cloudwatch-config)
+- Edit the **file_path** in the configuration file:
+```bash
+            {
+                "file_path": "/opt/aws/amazon-cloudwatch-agent/logs/cme.log",
+                "log_group_name": "cme.log",
+                "log_stream_name": "cme.log",
+                "timezone": "Local"
+              },
+```
+
+> We are sending cme.log from Management Server to this directory ```/opt/aws/amazon-cloudwatch-agent/logs/cme.log```. Therefore, we will need CloudWatch to collect ```cme.log``` from this directory, and pipe it to a CloudWatch log group called "cme.log". You can change this configuration to suit your requirement.
+
+- Go to the directory ```cd /home/user/cloudwatch-config/```
+- Execute the following command
+
 ```bash
 /opt/aws/amazon-cloudwatch-agent/bin/amazon-cloudwatch-agent-ctl -a fetch-config -m ec2 -c file:cloudwatch-config.cfg -s 
+```
+
+This will basically load ```cloudwatch-config.cfg`` and start the cloudwatch agent on the EC2 instance. To ensure that CloudWatch agent is running, execute the following and check the status
+
+```bash
+sudo service amazon-cloudwatch-agent status
+```
+
+And here is the expected output if the agent is running
+
+```bash
+Redirecting to /bin/systemctl status amazon-cloudwatch-agent.service
+● amazon-cloudwatch-agent.service - Amazon CloudWatch Agent
+   Loaded: loaded (/etc/systemd/system/amazon-cloudwatch-agent.service; enabled; vendor preset: disabled)
+   Active: active (running) since Sun 2020-12-13 11:32:41 +08; 2h 8min ago
+ Main PID: 3078 (amazon-cloudwat)
+   CGroup: /system.slice/amazon-cloudwatch-agent.service
+           └─3078 /opt/aws/amazon-cloudwatch-agent/bin/amazon-cloudwatch-agent -config /opt/aws/amazon-cloudwatch-agent/etc/amazon-cloudwatch-agent.toml -envconfig /opt/aws/amazon-cl...
+
+Dec 13 11:32:41 cloudwatch-proxy-instance systemd[1]: Started Amazon CloudWatch Agent.
+Dec 13 11:32:41 cloudwatch-proxy-instance systemd[1]: Starting Amazon CloudWatch Agent...
+Dec 13 11:32:41 cloudwatch-proxy-instance start-amazon-cloudwatch-agent[3078]: /opt/aws/amazon-cloudwatch-agent/etc/amazon-cloudwatch-agent.json does not exist or cannot read. Skipping it.
+Dec 13 11:32:41 cloudwatch-proxy-instance start-amazon-cloudwatch-agent[3078]: Valid Json input schema.
+Dec 13 11:32:41 cloudwatch-proxy-instance start-amazon-cloudwatch-agent[3078]: I! Detecting runasuser...
+Dec 13 11:32:43 cloudwatch-proxy-instance start-amazon-cloudwatch-agent[3078]: 2020/12/13 11:32:43 Seeked /opt/aws/amazon-cloudwatch-agent/logs/amazon-cloudwatch-agent.log - &{Offset:3...Whence:0}
+Dec 13 11:32:43 cloudwatch-proxy-instance start-amazon-cloudwatch-agent[3078]: 2020/12/13 11:32:43 Seeked /opt/aws/amazon-cloudwatch-agent/logs/cme.log - &{Offset:18167501 Whence:0}
+Dec 13 11:32:43 cloudwatch-proxy-instance start-amazon-cloudwatch-agent[3078]: 2020/12/13 11:32:43 Seeked /opt/aws/amazon-cloudwatch-agent/logs/test.log - &{Offset:38 Whence:0}
+Hint: Some lines were ellipsized, use -l to show in full.
+
 ```
 
 
