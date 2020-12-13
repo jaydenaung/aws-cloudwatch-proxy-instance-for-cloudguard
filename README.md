@@ -10,7 +10,9 @@ Secondly, we will then forward the logs from the CloudWatch proxy instance to ot
 
 In this lab, we will demonstrate piping CloudGuard Cloud Management Extension logs - ```cme.log``` from Management Server to CloudWatch Logs Group **and** S3 Bucket. 
 
-## 1. Launch an EC2 Instance 
+## 1. Setting up CloudWatch proxy instance on AWS
+
+### Launch an EC2 instance 
 
 Firstly, we need to deploy an EC2 instance to act as "proxy" server. Le The server can be any linux server. In our lab, we will be using "AWS Linux". 
 
@@ -18,7 +20,7 @@ Please see [how to launch an EC2 instance.](https://docs.aws.amazon.com/quicksta
 
 You should also set up the instance's networking so that it can communicate with the CloudGuard management server. By default, if it is deployed into a same VPC as Management Server, it can communicate with the management server. We'll also need to make sure that Security Groups of both Management Server and CloudWatch proxy instance allow SSH traffic to and from each other. 
 
-## 2.  Download the CloudWatch Log agent
+###  Download the CloudWatch Log agent
 
 Secondly, download the CloudWatch Log agent and configure the CloudWatch Agent.
 
@@ -35,7 +37,7 @@ For other operating systems, please check out [this AWS Documentation for how to
 ```
 
 
-## 3. CloudGuard Management Server
+## 2. CloudGuard Management Server
 
 On CloudGuard Management server, 
 
@@ -96,4 +98,3 @@ We'll need to create a cron job to send logs
 
 You will need to edit ```cloudwatch-agent-config.cfg```, and  
 
-## 4. 
