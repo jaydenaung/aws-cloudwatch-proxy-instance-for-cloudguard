@@ -287,9 +287,9 @@ This is a simple script that basically uploads ```cme.log``` to the destination 
 
 > For this script to run, you have to have ***AWS CLI*** installed on the instance. Amazon Linux comes with AWS CLI installed. 
 
-### 2. Uploading logs to S3 directly from Check Point Management Server using curl
+### 2. Uploading logs to S3 directly from Check Point Management Server using curl (Work-in-Progress)
 
-> Note: This is still work in progress although the script will work in most cases.
+> Note: This is still work in progress. The script might show errors as some commands are not available on management.
 
 If you want to upload the log files directly from Check Point management server, you will first need to attach an S3 policy to management server's role so that it can upload the file to S3 bucket.
 
