@@ -2,6 +2,8 @@
 
 This tutorial details a very simple proof-of-concept on forwarding system logs from Check Point CloudGuard Management server to AWS CloudWatch or AWS S3 bucket via an EC2 instance acting as a log forwarder or proxy instance. The need for a proxy instance is because, at the point of writing this tutorial, CloudWatch agent or AWS CLI cannot be installed on the Check Point Management Server due to the management server being hardened. One example use case for this is you might want to pipe CloudGuard's system logs such as cloud management extension logs (cme.log) to AWS CloudWatch or S3 bucket for either log aggregation, troubleshooting or analysis purpose. 
 
+> Note: This is not about sending custom Cloudwatch metrics to CloudWatch. Check out [sk108769](https://supportcenter.checkpoint.com/supportcenter/portal?eventSubmit_doGoviewsolutiondetails=&solutionid=sk108769&partition=Basic&product=vSEC) for integrating with Cloudwatch for sending custom metrics. This tutorial for forwarding "system-generated logs" to CloudWatch log groups or S3 buckets.
+
 I've created this lab and tutorial based on an actual use case of a customer who has a similar requirement. 
 
 ![header image](img/cg-cloudwatch-diagram.png)
