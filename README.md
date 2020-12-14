@@ -289,11 +289,9 @@ This is a simple script that basically uploads ```cme.log``` to the destination 
 
 ### 2. Uploading logs to S3 directly from Check Point Management Server using curl (Work-in-Progress)
 
-> Note: This is still work in progress. The script might show errors as some commands are not available on management.
+>Note: This is still work in progress. The script might show errors as some commands are not available on management server.
 
-If you want to upload the log files directly from Check Point management server, you will first need to attach an S3 policy to management server's role so that it can upload the file to S3 bucket.
-
-Download [curl-to-s3.sh](curl-to-s3.sh) from this repository, and edit it to suit your requirements. And place the script in a directory *e.g. /home/admin/cloudwatch/curl-to-s3.sh)
+However if you still want to test it out yourself, Download [curl-to-s3.sh](curl-to-s3.sh) from this repository, and edit it to suit your requirements. And place the script in a directory *e.g. /home/admin/cloudwatch/curl-to-s3.sh)
 
 
 ### Cron Job on the CloudWatch proxy instance or Management Server
